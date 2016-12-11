@@ -260,7 +260,7 @@ func (p *HoconValue) GetArray() []*HoconValue {
 	if len(p.values) == 0 {
 		return arrs
 	}
-
+	arrs = []*HoconValue{}
 	for _, v := range p.values {
 		if v.IsArray() {
 			arrs = append(arrs, v.GetArray()...)
@@ -275,7 +275,7 @@ func (p *HoconValue) GetChildObject(key string) *HoconValue {
 }
 
 func (p *HoconValue) IsArray() bool {
-	return len(p.GetArray()) > 0
+	return p.GetArray() != nil
 }
 
 func (p *HoconValue) quoteIfNeeded(text string) string {

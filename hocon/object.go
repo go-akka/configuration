@@ -8,6 +8,7 @@ import (
 
 type HoconObject struct {
 	items map[string]*HoconValue
+	keys  []string
 }
 
 func NewHoconObject() *HoconObject {
@@ -41,6 +42,7 @@ func (p *HoconObject) GetOrCreateKey(key string) *HoconValue {
 
 	child := NewHoconValue()
 	p.items[key] = child
+	p.keys = append(p.keys, key)
 	return child
 }
 
@@ -55,8 +57,9 @@ func (p *HoconObject) String() string {
 func (p *HoconObject) ToString(indent int) string {
 	tmp := strings.Repeat(" ", indent*2)
 	buf := bytes.NewBuffer(nil)
-	for k, v := range p.items {
+	for _, k := range p.keys {
 		key := p.quoteIfNeeded(k)
+		v := p.items[key]
 		buf.WriteString(fmt.Sprintf("%s%s : %s\r\n", tmp, key, v.ToString(indent)))
 	}
 	return buf.String()
