@@ -2,8 +2,10 @@ package hocon
 
 import (
 	"fmt"
+	"regexp"
 	"strconv"
 	"strings"
+	"time"
 )
 
 type HoconValue struct {
@@ -298,6 +300,43 @@ func (p *HoconValue) IsArray() bool {
 	return p.GetArray() != nil
 }
 
+func (p *HoconValue) GetTimeDuration(allowInfinite bool) time.Duration {
+	res := p.GetString()
+	groups, matched := findStringSubmatchMap(res, `^(?P<value>([0-9]+(\.[0-9]+)?))\s*(?P<unit>(nanoseconds|nanosecond|nanos|nano|ns|microseconds|microsecond|micros|micro|us|milliseconds|millisecond|millis|milli|ms|seconds|second|s|minutes|minute|m|hours|hour|h|days|day|d))$`)
+
+	if matched {
+		u := groups["unit"]
+		strV := groups["value"]
+		v := parsePositiveValue(strV)
+
+		switch u {
+		case "nanoseconds", "nanosecond", "nanos", "nano", "ns":
+			return time.Duration(float64(time.Nanosecond) * v)
+		case "microseconds", "microsecond", "micros", "micro":
+			return time.Duration(float64(time.Microsecond) * v)
+		case "milliseconds", "millisecond", "millis", "milli", "ms":
+			return time.Duration(float64(time.Millisecond) * v)
+		case "seconds", "second", "s":
+			return time.Duration(float64(time.Second) * v)
+		case "minutes", "minute", "m":
+			return time.Duration(float64(time.Minute) * v)
+		case "hours", "hour", "h":
+			return time.Duration(float64(time.Hour) * v)
+		case "days", "day", "d":
+			return time.Duration(float64(time.Hour*24) * v)
+		}
+	}
+
+	if strings.ToLower(res) == "infinite" {
+		if allowInfinite {
+			return time.Duration(-1)
+		}
+		panic("infinite time duration not allowed")
+	}
+
+	return time.Duration(float64(time.Millisecond) * parsePositiveValue(res))
+}
+
 func (p *HoconValue) quoteIfNeeded(text string) string {
 	if len(text) == 0 {
 		return "\"\""
@@ -309,4 +348,33 @@ func (p *HoconValue) quoteIfNeeded(text string) string {
 	}
 
 	return text
+}
+
+func findStringSubmatchMap(s, exp string) (map[string]string, bool) {
+	reg := regexp.MustCompile(exp)
+	captures := make(map[string]string)
+
+	match := reg.FindStringSubmatch(s)
+	if match == nil {
+		return captures, false
+	}
+
+	for i, name := range reg.SubexpNames() {
+		if i == 0 || name == "" {
+			continue
+		}
+		captures[name] = match[i]
+	}
+	return captures, true
+}
+
+func parsePositiveValue(v string) float64 {
+	value, err := strconv.ParseFloat(v, 64)
+	if err != nil {
+		panic(err)
+	}
+	if value < 0 {
+		panic("Expected a positive value instead of " + v)
+	}
+	return value
 }

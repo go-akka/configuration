@@ -2,6 +2,7 @@ package hocon
 
 import (
 	"strings"
+	"time"
 )
 
 type Config struct {
@@ -139,6 +140,26 @@ func (p *Config) GetFloat64(path string, defaultVal ...float64) float64 {
 		}
 	}
 	return obj.GetFloat64()
+}
+
+func (p *Config) GetTimeDuration(path string, defaultVal ...time.Duration) time.Duration {
+	obj := p.GetNode(path)
+	if obj := p.GetNode(path); obj == nil {
+		if len(defaultVal) > 0 {
+			return defaultVal[0]
+		}
+	}
+	return obj.GetTimeDuration(true)
+}
+
+func (p *Config) GetTimeDurationInfiniteNotAllowed(path string, defaultVal ...time.Duration) time.Duration {
+	obj := p.GetNode(path)
+	if obj := p.GetNode(path); obj == nil {
+		if len(defaultVal) > 0 {
+			return defaultVal[0]
+		}
+	}
+	return obj.GetTimeDuration(false)
 }
 
 func (p *Config) GetBooleanList(path string) []bool {
