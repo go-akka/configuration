@@ -65,6 +65,25 @@ func (p *HoconValue) concatString() string {
 	return strings.TrimSpace(concat)
 }
 
+func (p *HoconValue) GetByteSize() int64 {
+	res := p.GetString()
+	if len(res) > 0 {
+		if res[len(res)-1] == 'b' {
+			v := res[0 : len(res)-1]
+			i, err := strconv.ParseInt(v, 10, 64)
+			if err != nil {
+				panic(err)
+			}
+			return i
+		}
+	}
+	i, err := strconv.ParseInt(res, 10, 64)
+	if err != nil {
+		panic(err)
+	}
+	return i
+}
+
 func (p *HoconValue) String() string {
 	return p.ToString(0)
 }
@@ -73,6 +92,7 @@ func (p *HoconValue) ToString(indent int) string {
 	if p.IsString() {
 		return p.quoteIfNeeded(p.GetString())
 	}
+
 	if p.IsObject() {
 		tmp := strings.Repeat(" ", indent*2)
 		return fmt.Sprintf("{\r\n%s%s}", p.GetObject().ToString(indent+1), tmp)
@@ -280,7 +300,7 @@ func (p *HoconValue) IsArray() bool {
 
 func (p *HoconValue) quoteIfNeeded(text string) string {
 	if len(text) == 0 {
-		return ""
+		return "\"\""
 	}
 
 	if strings.IndexByte(text, ' ') >= 0 ||

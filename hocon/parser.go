@@ -1,6 +1,6 @@
 package hocon
 
-type IncludeCallback func(filename string) HoconRoot
+type IncludeCallback func(filename string) *HoconRoot
 
 type Parser struct {
 	reader   *HoconTokenizer

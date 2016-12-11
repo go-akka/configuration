@@ -10,12 +10,12 @@ type Config struct {
 	fallback      *Config
 }
 
-func NewConfigFromRoot(root *HoconRoot) Config {
+func NewConfigFromRoot(root *HoconRoot) *Config {
 	if root.Value() == nil {
 		panic("The root value cannot be null.")
 	}
 
-	return Config{
+	return &Config{
 		root:          root.Value(),
 		substitutions: root.Substitutions(),
 	}
@@ -36,25 +36,21 @@ func (p *Config) IsEmpty() bool {
 	return p.root == nil || p.root.IsEmpty()
 }
 
-func (p *Config) Root() HoconValue {
-	return *p.root
+func (p *Config) Root() *HoconValue {
+	return p.root
 }
 
-func (p *Config) Copy() Config {
+func (p *Config) Copy() *Config {
 
-	var fallback Config
+	var fallback *Config
 	if p.fallback != nil {
 		fallback = p.fallback.Copy()
 	}
-	return Config{
-		fallback:      &fallback,
+	return &Config{
+		fallback:      fallback,
 		root:          p.root,
 		substitutions: p.substitutions,
 	}
-}
-
-func (p *Config) GetValue(path string) *HoconValue {
-	return p.GetNode(path)
 }
 
 func (p *Config) GetNode(path string) *HoconValue {
@@ -77,11 +73,181 @@ func (p *Config) GetNode(path string) *HoconValue {
 	return currentNode
 }
 
-func (p *Config) GetString(path string) string {
-	if obj := p.GetNode(path); obj != nil {
-		return obj.GetString()
+func (p *Config) GetBoolean(path string, defaultVal ...bool) bool {
+	obj := p.GetNode(path)
+	if obj := p.GetNode(path); obj == nil {
+		if len(defaultVal) > 0 {
+			return defaultVal[0]
+		}
 	}
-	return ""
+	return obj.GetBoolean()
+}
+
+func (p *Config) GetByteSize(path string) int64 {
+	obj := p.GetNode(path)
+	if obj == nil {
+		return -1
+	}
+	return obj.GetByteSize()
+}
+
+func (p *Config) GetInt32(path string, defaultVal ...int32) int32 {
+	obj := p.GetNode(path)
+	if obj := p.GetNode(path); obj == nil {
+		if len(defaultVal) > 0 {
+			return defaultVal[0]
+		}
+	}
+	return obj.GetInt32()
+}
+
+func (p *Config) GetInt64(path string, defaultVal ...int64) int64 {
+	obj := p.GetNode(path)
+	if obj := p.GetNode(path); obj == nil {
+		if len(defaultVal) > 0 {
+			return defaultVal[0]
+		}
+	}
+	return obj.GetInt64()
+}
+
+func (p *Config) GetString(path string, defaultVal ...string) string {
+	obj := p.GetNode(path)
+	if obj := p.GetNode(path); obj == nil {
+		if len(defaultVal) > 0 {
+			return defaultVal[0]
+		}
+	}
+	return obj.GetString()
+}
+
+func (p *Config) GetFloat32(path string, defaultVal ...float32) float32 {
+	obj := p.GetNode(path)
+	if obj := p.GetNode(path); obj == nil {
+		if len(defaultVal) > 0 {
+			return defaultVal[0]
+		}
+	}
+	return obj.GetFloat32()
+}
+
+func (p *Config) GetFloat64(path string, defaultVal ...float64) float64 {
+	obj := p.GetNode(path)
+	if obj := p.GetNode(path); obj == nil {
+		if len(defaultVal) > 0 {
+			return defaultVal[0]
+		}
+	}
+	return obj.GetFloat64()
+}
+
+func (p *Config) GetBooleanList(path string) []bool {
+	obj := p.GetNode(path)
+	if obj := p.GetNode(path); obj == nil {
+		return nil
+	}
+	return obj.GetBooleanList()
+}
+
+func (p *Config) GetFloat32List(path string) []float32 {
+	obj := p.GetNode(path)
+	if obj := p.GetNode(path); obj == nil {
+		return nil
+	}
+	return obj.GetFloat32List()
+}
+
+func (p *Config) GetFloat64List(path string) []float64 {
+	obj := p.GetNode(path)
+	if obj := p.GetNode(path); obj == nil {
+		return nil
+	}
+	return obj.GetFloat64List()
+}
+
+func (p *Config) GetInt32List(path string) []int32 {
+	obj := p.GetNode(path)
+	if obj := p.GetNode(path); obj == nil {
+		return nil
+	}
+	return obj.GetInt32List()
+}
+
+func (p *Config) GetInt64List(path string) []int64 {
+	obj := p.GetNode(path)
+	if obj := p.GetNode(path); obj == nil {
+		return nil
+	}
+	return obj.GetInt64List()
+}
+
+func (p *Config) GetByteList(path string) []byte {
+	obj := p.GetNode(path)
+	if obj := p.GetNode(path); obj == nil {
+		return nil
+	}
+	return obj.GetByteList()
+}
+
+func (p *Config) GetStringList(path string) []string {
+	obj := p.GetNode(path)
+	if obj := p.GetNode(path); obj == nil {
+		return nil
+	}
+	return obj.GetStringList()
+}
+
+func (p *Config) GetConfig(path string) *Config {
+	value := p.GetNode(path)
+	if p.fallback != nil {
+		f := p.fallback.GetConfig(path)
+		if value == nil && f == nil {
+			return nil
+		}
+		if value == nil {
+			return f
+		}
+		return NewConfigFromRoot(NewHoconRoot(value)).WithFallback(f)
+	}
+
+	if value == nil {
+		return nil
+	}
+	return NewConfigFromRoot(NewHoconRoot(value))
+}
+
+func (p *Config) GetValue(path string) *HoconValue {
+	return p.GetNode(path)
+}
+
+func (p *Config) WithFallback(fallback *Config) *Config {
+	if fallback == p {
+		panic("Config can not have itself as fallback")
+	}
+
+	clone := p.Copy()
+	current := clone
+	for current.fallback != nil {
+		current = current.fallback
+	}
+	current.fallback = fallback
+	return clone
+}
+
+func (p *Config) HasPath(path string) bool {
+	return p.GetNode(path) != nil
+}
+
+func (p *Config) AddConfig(textConfig string, fallbackConfig *Config) *Config {
+	root := Parse(textConfig, nil)
+	config := NewConfigFromRoot(root)
+	return config.WithFallback(fallbackConfig)
+}
+
+func (p *Config) AddConfigWithTextFallback(config *Config, textFallback string) *Config {
+	fallbackRoot := Parse(textFallback, nil)
+	fallbackConfig := NewConfigFromRoot(fallbackRoot)
+	return config.WithFallback(fallbackConfig)
 }
 
 func splitDottedPathHonouringQuotes(path string) []string {

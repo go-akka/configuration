@@ -76,6 +76,7 @@ func (p *HoconObject) Merge(other *HoconObject) {
 			}
 		} else {
 			p.items[otherkey] = otherValue
+			p.keys = append(p.keys, otherkey)
 		}
 	}
 }
