@@ -84,7 +84,16 @@ func (p *Config) GetString(path string) string {
 	return ""
 }
 
-// TODO:
 func splitDottedPathHonouringQuotes(path string) []string {
-	return strings.Split(path, ".")
+	tmp1 := strings.Split(path, "\"")
+	var values []string
+	for i := 0; i < len(tmp1); i++ {
+		tmp2 := strings.Split(tmp1[i], ".")
+		for j := 0; j < len(tmp2); j++ {
+			if len(tmp2[j]) > 0 {
+				values = append(values, tmp2[j])
+			}
+		}
+	}
+	return values
 }
