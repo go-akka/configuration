@@ -1,5 +1,10 @@
-HOCON
+HOCON (Human-Optimized Config Object Notation)
 =====
+
+[HOCON Docs](https://github.com/typesafehub/config/blob/master/HOCON.md).
+
+> Currently, some features are not implemented, the API might be a little changed in the future.
+
 
 `example.go`
 
