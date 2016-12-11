@@ -97,16 +97,9 @@ func (p *Tokenizer) TakeOne() byte {
 }
 
 func (p *Tokenizer) PullWhitespace() {
-	for !p.EOF() && p.IsWhitespace(p.Peek()) {
+	for !p.EOF() && isWhitespace(p.Peek()) {
 		p.TakeOne()
 	}
-}
-
-func (p *Tokenizer) IsWhitespace(c byte) bool {
-	if c == ' ' || c == '\r' || c == '\n' || c == '\t' {
-		return true
-	}
-	return false
 }
 
 type HoconTokenizer struct {
@@ -295,7 +288,7 @@ func (p *HoconTokenizer) IsUnquotedKeyStart() bool {
 }
 
 func (p *HoconTokenizer) IsWhitespace() bool {
-	return p.Tokenizer.IsWhitespace(p.Peek())
+	return isWhitespace(p.Peek())
 }
 
 func (p *HoconTokenizer) IsWhitespaceOrComment() bool {
@@ -526,6 +519,13 @@ func (p *HoconTokenizer) isValue() bool {
 		p.IsSubstitutionStart() ||
 		p.IsStartOfQuotedText() ||
 		p.isUnquotedText() {
+		return true
+	}
+	return false
+}
+
+func isWhitespace(c byte) bool {
+	if c == ' ' || c == '\r' || c == '\n' || c == '\t' {
 		return true
 	}
 	return false
