@@ -529,7 +529,8 @@ func (p *HoconTokenizer) isValue() bool {
 }
 
 func isWhitespace(c byte) bool {
-	if c == ' ' || c == '\r' || c == '\n' || c == '\t' {
+	str := string(c)
+	if str == " " || str == "\r" || str == "\n" || str == "\t" || str == "\u00A0" || str == "\u2007" || str == "\u202F" || str == "\uFEFF" {
 		return true
 	}
 	return false
