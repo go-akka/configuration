@@ -7,8 +7,14 @@ import (
 	"github.com/go-akka/configuration/hocon"
 )
 
-func ParseString(text string, includeCallback hocon.IncludeCallback) *hocon.Config {
-	root := hocon.Parse(text, includeCallback)
+func ParseString(text string, includeCallback ...hocon.IncludeCallback) *hocon.Config {
+	var callback hocon.IncludeCallback
+	if len(includeCallback) > 0 {
+		callback = includeCallback[0]
+	} else {
+		callback = defaultIncludeCallback
+	}
+	root := hocon.Parse(text, callback)
 	return hocon.NewConfigFromRoot(root)
 }
 
