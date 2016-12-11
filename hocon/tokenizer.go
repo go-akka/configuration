@@ -425,7 +425,7 @@ func (p *HoconTokenizer) PullValue() *Token {
 }
 
 func (p *HoconTokenizer) IsSubstitutionStart() bool {
-	return p.Matches("${")
+	return p.MatchesMore([]string{"${", "${?"})
 }
 
 func (p *HoconTokenizer) IsInclude() bool {
@@ -451,6 +451,10 @@ func (p *HoconTokenizer) IsInclude() bool {
 func (p *HoconTokenizer) pullSubstitution() *Token {
 	buf := bytes.NewBuffer(nil)
 	p.Take(2)
+	if p.Peek() == '?' {
+		p.TakeOne()
+	}
+
 	for !p.EOF() && p.isUnquotedText() {
 		if err := buf.WriteByte(p.TakeOne()); err != nil {
 			panic(err)

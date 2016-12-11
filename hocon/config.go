@@ -80,6 +80,7 @@ func (p *Config) GetBoolean(path string, defaultVal ...bool) bool {
 		if len(defaultVal) > 0 {
 			return defaultVal[0]
 		}
+		return false
 	}
 	return obj.GetBoolean()
 }
@@ -98,6 +99,7 @@ func (p *Config) GetInt32(path string, defaultVal ...int32) int32 {
 		if len(defaultVal) > 0 {
 			return defaultVal[0]
 		}
+		return 0
 	}
 	return obj.GetInt32()
 }
@@ -108,6 +110,7 @@ func (p *Config) GetInt64(path string, defaultVal ...int64) int64 {
 		if len(defaultVal) > 0 {
 			return defaultVal[0]
 		}
+		return 0
 	}
 	return obj.GetInt64()
 }
@@ -118,6 +121,7 @@ func (p *Config) GetString(path string, defaultVal ...string) string {
 		if len(defaultVal) > 0 {
 			return defaultVal[0]
 		}
+		return ""
 	}
 	return obj.GetString()
 }
@@ -138,6 +142,7 @@ func (p *Config) GetFloat64(path string, defaultVal ...float64) float64 {
 		if len(defaultVal) > 0 {
 			return defaultVal[0]
 		}
+		return 0
 	}
 	return obj.GetFloat64()
 }
@@ -148,6 +153,7 @@ func (p *Config) GetTimeDuration(path string, defaultVal ...time.Duration) time.
 		if len(defaultVal) > 0 {
 			return defaultVal[0]
 		}
+		return 0
 	}
 	return obj.GetTimeDuration(true)
 }
@@ -158,6 +164,7 @@ func (p *Config) GetTimeDurationInfiniteNotAllowed(path string, defaultVal ...ti
 		if len(defaultVal) > 0 {
 			return defaultVal[0]
 		}
+		return 0
 	}
 	return obj.GetTimeDuration(false)
 }
