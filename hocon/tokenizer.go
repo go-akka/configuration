@@ -384,8 +384,6 @@ func (p *HoconTokenizer) pullEscapeSequence() string {
 	default:
 		panic(fmt.Errorf("Unknown escape code: %v", escaped))
 	}
-
-	return ""
 }
 
 func (p *HoconTokenizer) IsStartOfComment() bool {
