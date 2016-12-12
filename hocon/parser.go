@@ -1,5 +1,9 @@
 package hocon
 
+import (
+	"strings"
+)
+
 type IncludeCallback func(filename string) *HoconRoot
 
 type Parser struct {
@@ -23,9 +27,10 @@ func (p *Parser) parseText(text string, callback IncludeCallback) *HoconRoot {
 
 	root := NewHoconRoot(p.root)
 
-	c := NewConfigFromRoot(root)
+	cRoot := root.Value()
+
 	for _, sub := range p.substitutions {
-		res := c.GetValue(sub.Path)
+		res := getNode(cRoot, sub.Path)
 		if res == nil {
 			panic("Unresolved substitution:" + sub.Path)
 		}
@@ -157,4 +162,35 @@ func (p *Parser) ignoreComma() {
 	if p.reader.IsComma() {
 		p.reader.PullComma()
 	}
+}
+
+func getNode(root *HoconValue, path string) *HoconValue {
+	elements := splitDottedPathHonouringQuotes(path)
+	currentNode := root
+
+	if currentNode == nil {
+		panic("Current node should not be null")
+	}
+
+	for _, key := range elements {
+		currentNode = currentNode.GetChildObject(key)
+		if currentNode == nil {
+			return nil
+		}
+	}
+	return currentNode
+}
+
+func splitDottedPathHonouringQuotes(path string) []string {
+	tmp1 := strings.Split(path, "\"")
+	var values []string
+	for i := 0; i < len(tmp1); i++ {
+		tmp2 := strings.Split(tmp1[i], ".")
+		for j := 0; j < len(tmp2); j++ {
+			if len(tmp2[j]) > 0 {
+				values = append(values, tmp2[j])
+			}
+		}
+	}
+	return values
 }

@@ -1,17 +1,19 @@
-package hocon
+package configuration
 
 import (
 	"strings"
 	"time"
+
+	"github.com/go-akka/configuration/hocon"
 )
 
 type Config struct {
-	root          *HoconValue
-	substitutions []*HoconSubstitution
+	root          *hocon.HoconValue
+	substitutions []*hocon.HoconSubstitution
 	fallback      *Config
 }
 
-func NewConfigFromRoot(root *HoconRoot) *Config {
+func NewConfigFromRoot(root *hocon.HoconRoot) *Config {
 	if root.Value() == nil {
 		panic("The root value cannot be null.")
 	}
@@ -37,7 +39,7 @@ func (p *Config) IsEmpty() bool {
 	return p.root == nil || p.root.IsEmpty()
 }
 
-func (p *Config) Root() *HoconValue {
+func (p *Config) Root() *hocon.HoconValue {
 	return p.root
 }
 
@@ -54,7 +56,7 @@ func (p *Config) Copy() *Config {
 	}
 }
 
-func (p *Config) GetNode(path string) *HoconValue {
+func (p *Config) GetNode(path string) *hocon.HoconValue {
 	elements := splitDottedPathHonouringQuotes(path)
 	currentNode := p.root
 
@@ -235,16 +237,16 @@ func (p *Config) GetConfig(path string) *Config {
 		if value == nil {
 			return f
 		}
-		return NewConfigFromRoot(NewHoconRoot(value)).WithFallback(f)
+		return NewConfigFromRoot(hocon.NewHoconRoot(value)).WithFallback(f)
 	}
 
 	if value == nil {
 		return nil
 	}
-	return NewConfigFromRoot(NewHoconRoot(value))
+	return NewConfigFromRoot(hocon.NewHoconRoot(value))
 }
 
-func (p *Config) GetValue(path string) *HoconValue {
+func (p *Config) GetValue(path string) *hocon.HoconValue {
 	return p.GetNode(path)
 }
 
@@ -267,15 +269,19 @@ func (p *Config) HasPath(path string) bool {
 }
 
 func (p *Config) AddConfig(textConfig string, fallbackConfig *Config) *Config {
-	root := Parse(textConfig, nil)
+	root := hocon.Parse(textConfig, nil)
 	config := NewConfigFromRoot(root)
 	return config.WithFallback(fallbackConfig)
 }
 
 func (p *Config) AddConfigWithTextFallback(config *Config, textFallback string) *Config {
-	fallbackRoot := Parse(textFallback, nil)
+	fallbackRoot := hocon.Parse(textFallback, nil)
 	fallbackConfig := NewConfigFromRoot(fallbackRoot)
 	return config.WithFallback(fallbackConfig)
+}
+
+func (p Config) String() string {
+	return p.root.String()
 }
 
 func splitDottedPathHonouringQuotes(path string) []string {

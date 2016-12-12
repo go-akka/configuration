@@ -7,7 +7,7 @@ import (
 	"github.com/go-akka/configuration/hocon"
 )
 
-func ParseString(text string, includeCallback ...hocon.IncludeCallback) *hocon.Config {
+func ParseString(text string, includeCallback ...hocon.IncludeCallback) *Config {
 	var callback hocon.IncludeCallback
 	if len(includeCallback) > 0 {
 		callback = includeCallback[0]
@@ -15,10 +15,10 @@ func ParseString(text string, includeCallback ...hocon.IncludeCallback) *hocon.C
 		callback = defaultIncludeCallback
 	}
 	root := hocon.Parse(text, callback)
-	return hocon.NewConfigFromRoot(root)
+	return NewConfigFromRoot(root)
 }
 
-func LoadConfig(filename string) *hocon.Config {
+func LoadConfig(filename string) *Config {
 	data, err := ioutil.ReadFile(filename)
 	if err != nil {
 		panic(err)
@@ -27,7 +27,7 @@ func LoadConfig(filename string) *hocon.Config {
 	return ParseString(string(data), defaultIncludeCallback)
 }
 
-func FromObject(obj interface{}) *hocon.Config {
+func FromObject(obj interface{}) *Config {
 	data, err := json.Marshal(obj)
 	if err != nil {
 		panic(err)
