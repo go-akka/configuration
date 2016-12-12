@@ -24,12 +24,12 @@ func NewConfigFromRoot(root *hocon.HoconRoot) *Config {
 	}
 }
 
-func NewConfigFromConfig(source, fallback *Config) Config {
+func NewConfigFromConfig(source, fallback *Config) *Config {
 	if source == nil {
 		panic("The source configuration cannot be null.")
 	}
 
-	return Config{
+	return &Config{
 		root:     source.root,
 		fallback: fallback,
 	}
