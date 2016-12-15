@@ -45,6 +45,12 @@ func (p *Parser) parseObject(owner *HoconValue, root bool, currentPath string) {
 		owner.NewValue(NewHoconObject())
 	}
 
+	if owner.IsObject() {
+		if owner.oldValue != nil && owner.oldValue.GetObject() != nil {
+			owner.GetObject().Merge(owner.oldValue.GetObject())
+		}
+	}
+
 	currentObject := owner.GetObject()
 
 	for !p.reader.EOF() {
@@ -71,7 +77,6 @@ func (p *Parser) parseObject(owner *HoconValue, root bool, currentPath string) {
 			if !root {
 				return
 			}
-
 		case TokenTypeObjectEnd:
 			return
 		}

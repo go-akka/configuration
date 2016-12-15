@@ -7,8 +7,8 @@ import (
 )
 
 const (
-	HoconNotInUnquotedKey  = "$\"{}[]:=,#`^?!@*&\\."
-	HoconNotInUnquotedText = "$\"{}[]:=,#`^?!@*&\\"
+	HoconNotInUnquotedKey  = "$\"{}[]:=+,#`^?!@*&\\."
+	HoconNotInUnquotedText = "$\"{}[]:=+,#`^?!@*&\\"
 )
 
 type Tokenizer struct {
