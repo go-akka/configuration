@@ -143,47 +143,34 @@ func (p *HoconTokenizer) PullRestOfLine() string {
 	return strings.TrimSpace(buf.String())
 }
 
-func (p *HoconTokenizer) PullNext() *Token {
+func (p *HoconTokenizer) PullNext() (token *Token) {
+
 	p.PullWhitespaceAndComments()
 
 	if p.IsDot() {
-		return p.PullDot()
+		token = p.PullDot()
+	} else if p.IsObjectStart() {
+		token = p.PullStartOfObject()
+	} else if p.IsEndOfObject() {
+		token = p.PullEndOfObject()
+	} else if p.IsAssignment() {
+		token = p.PullAssignment()
+	} else if p.IsInclude() {
+		token = p.PullInclude()
+	} else if p.isStartOfQuotedKey() {
+		token = p.PullQuotedKey()
+	} else if p.IsUnquotedKeyStart() {
+		token = p.PullUnquotedKey()
+	} else if p.IsArrayStart() {
+		token = p.PullArrayStart()
+	} else if p.IsArrayEnd() {
+		token = p.PullArrayEnd()
+	} else if p.EOF() {
+		token = NewToken(TokenTypeEoF)
 	}
 
-	if p.IsObjectStart() {
-		return p.PullStartOfObject()
-	}
-
-	if p.IsEndOfObject() {
-		return p.PullEndOfObject()
-	}
-
-	if p.IsAssignment() {
-		return p.PullAssignment()
-	}
-
-	if p.IsInclude() {
-		return p.PullInclude()
-	}
-
-	if p.isStartOfQuotedKey() {
-		return p.PullQuotedKey()
-	}
-
-	if p.IsUnquotedKeyStart() {
-		return p.PullUnquotedKey()
-	}
-
-	if p.IsArrayStart() {
-		return p.PullArrayStart()
-	}
-
-	if p.IsArrayEnd() {
-		return p.PullArrayEnd()
-	}
-
-	if p.EOF() {
-		return NewToken(TokenTypeEoF)
+	if token != nil {
+		return
 	}
 
 	panic("unknown token")
@@ -276,6 +263,7 @@ func (p *HoconTokenizer) PullUnquotedKey() *Token {
 			panic(err)
 		}
 	}
+
 	return DefaultToken.Key(strings.TrimSpace(buf.String()))
 }
 

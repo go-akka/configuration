@@ -3,7 +3,8 @@ package hocon
 type TokenType int
 
 const (
-	TokenTypeComment TokenType = iota + 1
+	TokenTypeNone TokenType = iota
+	TokenTypeComment
 	TokenTypeKey
 	TokenTypeLiteralValue
 	TokenTypeAssign

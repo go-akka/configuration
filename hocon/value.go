@@ -9,7 +9,8 @@ import (
 )
 
 type HoconValue struct {
-	values []HoconElement
+	values   []HoconElement
+	oldValue *HoconValue
 }
 
 func NewHoconValue() *HoconValue {
@@ -42,6 +43,7 @@ func (p *HoconValue) IsString() bool {
 
 	strCount := 0
 	for _, v := range p.values {
+		v = p.topValueOfSub(v)
 		if v.IsString() {
 			strCount += 1
 		}
@@ -54,9 +56,24 @@ func (p *HoconValue) IsString() bool {
 	return false
 }
 
+func (p *HoconValue) topValueOfSub(v interface{}) HoconElement {
+	if v == nil {
+		return nil
+	}
+
+	if sub, ok := v.(*HoconSubstitution); ok {
+		if sub.ResolvedValue != nil && sub.ResolvedValue.oldValue != nil {
+			return sub.ResolvedValue.oldValue
+		}
+	}
+
+	return v.(HoconElement)
+}
+
 func (p *HoconValue) concatString() string {
 	concat := ""
 	for _, v := range p.values {
+		v = p.topValueOfSub(v)
 		concat += v.GetString()
 	}
 
@@ -112,20 +129,26 @@ func (p *HoconValue) ToString(indent int) string {
 }
 
 func (p *HoconValue) GetObject() *HoconObject {
-
 	if len(p.values) == 0 {
 		return nil
 	}
 
-	var raw interface{}
-	raw = p.values[0]
-
+	raw := p.values[0]
 	if o, ok := raw.(*HoconObject); ok {
 		return o
 	}
 
+	raw = p.topValueOfSub(raw)
+
+	if s, ok := raw.(*HoconSubstitution); ok {
+		if s.ResolvedValue == nil {
+			return nil
+		}
+	}
+
 	if sub, ok := raw.(MightBeAHoconObject); ok {
 		if sub != nil && sub.IsObject() {
+
 			return sub.GetObject()
 		}
 	}
@@ -284,6 +307,7 @@ func (p *HoconValue) GetArray() []*HoconValue {
 	}
 	arrs = []*HoconValue{}
 	for _, v := range p.values {
+		v = p.topValueOfSub(v)
 		if v.IsArray() {
 			arrs = append(arrs, v.GetArray()...)
 		}

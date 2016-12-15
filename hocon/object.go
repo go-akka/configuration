@@ -35,9 +35,11 @@ func (p *HoconObject) GetKey(key string) *HoconValue {
 }
 
 func (p *HoconObject) GetOrCreateKey(key string) *HoconValue {
-
 	if value, exist := p.items[key]; exist {
-		return value
+		child := NewHoconValue()
+		child.oldValue = value
+		p.items[key] = child
+		return child
 	}
 
 	child := NewHoconValue()
