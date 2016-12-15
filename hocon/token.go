@@ -11,6 +11,7 @@ const (
 	TokenTypeObjectStart
 	TokenTypeObjectEnd
 	TokenTypeDot
+	TokenTypeNewline
 	TokenTypeEoF
 	TokenTypeArrayStart
 	TokenTypeArrayEnd

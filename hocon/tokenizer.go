@@ -146,7 +146,6 @@ func (p *HoconTokenizer) PullRestOfLine() string {
 func (p *HoconTokenizer) PullNext() (token *Token) {
 
 	p.PullWhitespaceAndComments()
-
 	if p.IsDot() {
 		token = p.PullDot()
 	} else if p.IsObjectStart() {
@@ -208,6 +207,11 @@ func (p *HoconTokenizer) PullComma() *Token {
 	return NewToken(TokenTypeComma)
 }
 
+func (p *HoconTokenizer) PullNewline() *Token {
+	p.Take(2)
+	return NewToken(TokenTypeNewline)
+}
+
 func (p *HoconTokenizer) PullStartOfObject() *Token {
 	p.TakeOne()
 	return NewToken(TokenTypeObjectStart)
@@ -225,6 +229,10 @@ func (p *HoconTokenizer) PullAssignment() *Token {
 
 func (p *HoconTokenizer) IsComma() bool {
 	return p.Matches(",")
+}
+
+func (p *HoconTokenizer) IsNewline() bool {
+	return p.Matches(`\n`)
 }
 
 func (p *HoconTokenizer) IsDot() bool {

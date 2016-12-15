@@ -132,6 +132,7 @@ func (p *Parser) ParseValue(owner *HoconValue, currentPath string) {
 		}
 	}
 	p.ignoreComma()
+	p.ignoreNewline()
 }
 
 func (p *Parser) ParseTrailingWhitespace(owner *HoconValue) {
@@ -161,6 +162,12 @@ func (p *Parser) ParseArray(currentPath string) HoconArray {
 func (p *Parser) ignoreComma() {
 	if p.reader.IsComma() {
 		p.reader.PullComma()
+	}
+}
+
+func (p *Parser) ignoreNewline() {
+	if p.reader.IsNewline() {
+		p.reader.PullNewline()
 	}
 }
 
