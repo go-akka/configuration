@@ -1,6 +1,7 @@
 package hocon
 
 import (
+	"os"
 	"strings"
 )
 
@@ -32,9 +33,16 @@ func (p *Parser) parseText(text string, callback IncludeCallback) *HoconRoot {
 	for _, sub := range p.substitutions {
 		res := getNode(cRoot, sub.Path)
 		if res == nil {
-			panic("Unresolved substitution:" + sub.Path)
+			envVal, exist := os.LookupEnv(sub.Path)
+			if !exist {
+				panic("Unresolved substitution:" + sub.Path)
+			}
+			hv := NewHoconValue()
+			hv.AppendValue(NewHoconLiteral(envVal))
+			sub.ResolvedValue = hv
+		} else {
+			sub.ResolvedValue = res
 		}
-		sub.ResolvedValue = res
 	}
 
 	return NewHoconRoot(p.root, p.substitutions...)
