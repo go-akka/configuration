@@ -35,7 +35,7 @@ func (p *HoconValue) AtKey(key string) *HoconRoot {
 	obj.GetOrCreateKey(key)
 	obj.items[key] = p
 	r := NewHoconValue()
-	r.values = append(r.values, obj)
+	r.AppendValue(obj)
 	return NewHoconRoot(r)
 }
 

@@ -138,7 +138,7 @@ func (p *Parser) ParseTrailingWhitespace(owner *HoconValue) {
 	ws := p.reader.PullSpaceOrTab()
 	if len(ws.value) > 0 {
 		wsList := NewHoconLiteral(ws.value)
-		owner.values = append(owner.values, wsList)
+		owner.AppendValue(wsList)
 	}
 }
 
