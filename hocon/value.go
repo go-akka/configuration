@@ -2,10 +2,40 @@ package hocon
 
 import (
 	"fmt"
+	"math/big"
 	"regexp"
 	"strconv"
 	"strings"
 	"time"
+)
+
+var (
+	_Num1000 = big.NewInt(1000)
+	_Num1024 = big.NewInt(1024)
+)
+
+var (
+	_IByte = big.NewInt(1)
+	_KByte = (&big.Int{}).Mul(_IByte, _Num1000)
+	_MByte = (&big.Int{}).Mul(_KByte, _Num1000)
+	_GByte = (&big.Int{}).Mul(_MByte, _Num1000)
+	_TByte = (&big.Int{}).Mul(_GByte, _Num1000)
+	_PByte = (&big.Int{}).Mul(_TByte, _Num1000)
+	_EByte = (&big.Int{}).Mul(_PByte, _Num1000)
+	_ZByte = (&big.Int{}).Mul(_EByte, _Num1000)
+	_YByte = (&big.Int{}).Mul(_ZByte, _Num1000)
+)
+
+var (
+	_Byte   = big.NewInt(1)
+	_KiByte = (&big.Int{}).Mul(_Byte, _Num1024)
+	_MiByte = (&big.Int{}).Mul(_KiByte, _Num1024)
+	_GiByte = (&big.Int{}).Mul(_MiByte, _Num1024)
+	_TiByte = (&big.Int{}).Mul(_GiByte, _Num1024)
+	_PiByte = (&big.Int{}).Mul(_TiByte, _Num1024)
+	_EiByte = (&big.Int{}).Mul(_PiByte, _Num1024)
+	_ZiByte = (&big.Int{}).Mul(_EiByte, _Num1024)
+	_YiByte = (&big.Int{}).Mul(_ZiByte, _Num1024)
 )
 
 type HoconValue struct {
@@ -84,23 +114,59 @@ func (p *HoconValue) concatString() string {
 	return strings.TrimSpace(concat)
 }
 
-func (p *HoconValue) GetByteSize() int64 {
+func (p *HoconValue) GetByteSize() *big.Int {
 	res := p.GetString()
-	if len(res) > 0 {
-		if res[len(res)-1] == 'b' {
-			v := res[0 : len(res)-1]
-			i, err := strconv.ParseInt(v, 10, 64)
-			if err != nil {
-				panic(err)
-			}
-			return i
+	groups, matched := findStringSubmatchMap(res, `^(?P<value>([0-9]+(\.[0-9]+)?))\s*(?P<unit>(B|b|byte|bytes|kB|kilobyte|kilobytes|MB|megabyte|megabytes|GB|gigabyte|gigabytes|TB|terabyte|terabytes|PB|petabyte|petabytes|EB|exabyte|exabytes|ZB|zettabyte|zettabytes|YB|yottabyte|yottabytes|K|k|Ki|KiB|kibibyte|kibibytes|M|m|Mi|MiB|mebibyte|mebibytes|G|g|Gi|GiB|gibibyte|gibibytes|T|t|Ti|TiB|tebibyte|tebibytes|P|p|Pi|PiB|pebibyte|pebibytes|E|e|Ei|EiB|exbibyte|exbibytes|Z|z|Zi|ZiB|zebibyte|zebibytes|Y|y|Yi|YiB|yobibyte|yobibytes))$`)
+
+	if matched {
+		u := groups["unit"]
+		strV := groups["value"]
+
+		v := int64(parsePositiveValue(strV))
+
+		bigInt := big.NewInt(v)
+
+		switch u {
+		case "B", "b", "byte", "bytes":
+			return (&big.Int{}).Mul(bigInt, _IByte)
+		case "kB", "kilobyte", "kilobytes":
+			return (&big.Int{}).Mul(bigInt, _KByte)
+		case "MB", "megabyte", "megabytes":
+			return (&big.Int{}).Mul(bigInt, _MByte)
+		case "GB", "gigabyte", "gigabytes":
+			return (&big.Int{}).Mul(bigInt, _GByte)
+		case "TB", "terabyte", "terabytes":
+			return (&big.Int{}).Mul(bigInt, _TByte)
+		case "PB", "petabyte", "petabytes":
+			return (&big.Int{}).Mul(bigInt, _PByte)
+		case "EB", "exabyte", "exabytes":
+			return (&big.Int{}).Mul(bigInt, _EByte)
+		case "ZB", "zettabyte", "zettabytes":
+			return (&big.Int{}).Mul(bigInt, _ZByte)
+		case "YB", "yottabyte", "yottabytes":
+			return (&big.Int{}).Mul(bigInt, _YByte)
+		case "K", "k", "Ki", "KiB", "kibibyte", "kibibytes":
+			return (&big.Int{}).Mul(bigInt, _Byte)
+		case "M", "m", "Mi", "MiB", "mebibyte", "mebibytes":
+			return (&big.Int{}).Mul(bigInt, _MiByte)
+		case "G", "g", "Gi", "GiB", "gibibyte", "gibibytes":
+			return (&big.Int{}).Mul(bigInt, _GiByte)
+		case "T", "t", "Ti", "TiB", "tebibyte", "tebibytes":
+			return (&big.Int{}).Mul(bigInt, _TiByte)
+		case "P", "p", "Pi", "PiB", "pebibyte", "pebibytes":
+			return (&big.Int{}).Mul(bigInt, _PiByte)
+		case "E", "e", "Ei", "EiB", "exbibyte", "exbibytes":
+			return (&big.Int{}).Mul(bigInt, _EiByte)
+		case "Z", "z", "Zi", "ZiB", "zebibyte", "zebibytes":
+			return (&big.Int{}).Mul(bigInt, _ZiByte)
+		case "Y", "y", "Yi", "YiB", "yobibyte", "yobibytes":
+			return (&big.Int{}).Mul(bigInt, _YiByte)
 		}
 	}
-	i, err := strconv.ParseInt(res, 10, 64)
-	if err != nil {
-		panic(err)
-	}
-	return i
+
+	panic("unknown byte size unit")
+
+	return nil
 }
 
 func (p *HoconValue) String() string {

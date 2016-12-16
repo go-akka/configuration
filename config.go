@@ -1,6 +1,7 @@
 package configuration
 
 import (
+	"math/big"
 	"strings"
 	"time"
 
@@ -87,10 +88,10 @@ func (p *Config) GetBoolean(path string, defaultVal ...bool) bool {
 	return obj.GetBoolean()
 }
 
-func (p *Config) GetByteSize(path string) int64 {
+func (p *Config) GetByteSize(path string) *big.Int {
 	obj := p.GetNode(path)
 	if obj == nil {
-		return -1
+		return big.NewInt(-1)
 	}
 	return obj.GetByteSize()
 }
