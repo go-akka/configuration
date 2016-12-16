@@ -383,7 +383,11 @@ func (p *HoconValue) GetArray() []*HoconValue {
 }
 
 func (p *HoconValue) GetChildObject(key string) *HoconValue {
-	return p.GetObject().GetKey(key)
+	obj := p.GetObject()
+	if obj == nil {
+		return nil
+	}
+	return obj.GetKey(key)
 }
 
 func (p *HoconValue) IsArray() bool {

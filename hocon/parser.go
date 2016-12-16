@@ -57,8 +57,16 @@ func (p *Parser) parseObject(owner *HoconValue, root bool, currentPath string) {
 	}
 
 	if owner.IsObject() {
-		if owner.oldValue != nil && owner.oldValue.GetObject() != nil {
-			owner.GetObject().Merge(owner.oldValue.GetObject())
+		rootObj := owner
+		for rootObj.oldValue != nil {
+			oldObj := rootObj.oldValue.GetObject()
+			obj := rootObj.GetObject()
+
+			if oldObj == nil || obj == nil {
+				break
+			}
+			obj.Merge(oldObj)
+			rootObj = rootObj.oldValue
 		}
 	}
 
