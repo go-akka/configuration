@@ -8,6 +8,7 @@ const (
 	TokenTypeKey
 	TokenTypeLiteralValue
 	TokenTypeAssign
+	TokenTypePlusAssign
 	TokenTypeObjectStart
 	TokenTypeObjectEnd
 	TokenTypeDot
@@ -73,6 +74,8 @@ func StringTokenType(tokenType TokenType) string {
 		return "TokenTypeLiteralValue"
 	case TokenTypeAssign:
 		return "TokenTypeAssign"
+	case TokenTypePlusAssign:
+		return "TokenTypePlusAssign"
 	case TokenTypeObjectStart:
 		return "TokenTypeObjectStart"
 	case TokenTypeObjectEnd:

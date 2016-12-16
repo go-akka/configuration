@@ -104,7 +104,15 @@ func (p *Parser) parseKeyContent(value *HoconValue, currentPath string) {
 					value.Clear()
 				}
 			}
-			p.ParseValue(value, currentPath)
+			p.ParseValue(value, false, currentPath)
+			return
+		case TokenTypePlusAssign:
+			{
+				if !value.IsObject() {
+					value.Clear()
+				}
+			}
+			p.ParseValue(value, true, currentPath)
 			return
 		case TokenTypeObjectStart:
 			p.parseObject(value, true, currentPath)
@@ -113,7 +121,7 @@ func (p *Parser) parseKeyContent(value *HoconValue, currentPath string) {
 	}
 }
 
-func (p *Parser) ParseValue(owner *HoconValue, currentPath string) {
+func (p *Parser) ParseValue(owner *HoconValue, isEqualPlus bool, currentPath string) {
 	if p.reader.EOF() {
 		panic("End of file reached while trying to read a value")
 	}
@@ -121,6 +129,12 @@ func (p *Parser) ParseValue(owner *HoconValue, currentPath string) {
 	p.reader.PullWhitespaceAndComments()
 	for p.reader.isValue() {
 		t := p.reader.PullValue()
+
+		if isEqualPlus {
+			sub := p.ParseSubstitution(currentPath)
+			p.substitutions = append(p.substitutions, sub)
+			owner.AppendValue(sub)
+		}
 
 		switch t.tokenType {
 		case TokenTypeEoF:
@@ -165,7 +179,7 @@ func (p *Parser) ParseArray(currentPath string) HoconArray {
 	arr := NewHoconArray()
 	for !p.reader.EOF() && !p.reader.IsArrayEnd() {
 		v := NewHoconValue()
-		p.ParseValue(v, currentPath)
+		p.ParseValue(v, false, currentPath)
 		arr.values = append(arr.values, v)
 		p.reader.PullWhitespaceAndComments()
 	}

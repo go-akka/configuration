@@ -154,6 +154,8 @@ func (p *HoconTokenizer) PullNext() (token *Token) {
 		token = p.PullEndOfObject()
 	} else if p.IsAssignment() {
 		token = p.PullAssignment()
+	} else if p.IsPlusAssignment() {
+		token = p.PullPlusAssignment()
 	} else if p.IsInclude() {
 		token = p.PullInclude()
 	} else if p.isStartOfQuotedKey() {
@@ -227,6 +229,11 @@ func (p *HoconTokenizer) PullAssignment() *Token {
 	return NewToken(TokenTypeAssign)
 }
 
+func (p *HoconTokenizer) PullPlusAssignment() *Token {
+	p.Take(2)
+	return NewToken(TokenTypePlusAssign)
+}
+
 func (p *HoconTokenizer) IsComma() bool {
 	return p.Matches(",")
 }
@@ -249,6 +256,10 @@ func (p *HoconTokenizer) IsEndOfObject() bool {
 
 func (p *HoconTokenizer) IsAssignment() bool {
 	return p.MatchesMore([]string{"=", ":"})
+}
+
+func (p *HoconTokenizer) IsPlusAssignment() bool {
+	return p.Matches("+=")
 }
 
 func (p *HoconTokenizer) IsStartOfQuotedText() bool {

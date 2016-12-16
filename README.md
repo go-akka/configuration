@@ -51,6 +51,12 @@ byte-size=10MiB
 
 // system envs
 home:${HOME}
+
+plus-equal=foo
+plus-equal+=bar
+
+plus-equal-array=[foo]
+plus-equal-array+=[bar, ${HOME}]
 `
 
 func main() {
@@ -69,7 +75,10 @@ func main() {
   fmt.Println("byte-size:", conf.GetByteSize("byte-size"))
   fmt.Println("home:", conf.GetString("home"))
   fmt.Println("default:", conf.GetString("none", "default-value"))
+  fmt.Println("plus-equal:", conf.GetString("plus-equal"))
+  fmt.Println("plus-equal-array:", conf.GetStringList("plus-equal-array"))
 }
+
 ```
 
 ```bash
@@ -87,4 +96,6 @@ self-ref: [1 2]
 byte-size: 10485760
 home: /Users/zeal
 default: default-value
+plus-equal: foobar
+plus-equal-array: [foo bar /Users/zeal]
 ```
