@@ -60,3 +60,39 @@ func (p *Token) LiteralValue(value string) *Token {
 func (p *Token) Include(path string) *Token {
 	return &Token{tokenType: TokenTypeInclude, value: path}
 }
+
+func StringTokenType(tokenType TokenType) string {
+	switch tokenType {
+	case TokenTypeNone:
+		return "TokenTypeNone"
+	case TokenTypeComment:
+		return "TokenTypeComment"
+	case TokenTypeKey:
+		return "TokenTypeKey"
+	case TokenTypeLiteralValue:
+		return "TokenTypeLiteralValue"
+	case TokenTypeAssign:
+		return "TokenTypeAssign"
+	case TokenTypeObjectStart:
+		return "TokenTypeObjectStart"
+	case TokenTypeObjectEnd:
+		return "TokenTypeObjectEnd"
+	case TokenTypeDot:
+		return "TokenTypeDot"
+	case TokenTypeNewline:
+		return "TokenTypeNewline"
+	case TokenTypeEoF:
+		return "TokenTypeEoF"
+	case TokenTypeArrayStart:
+		return "TokenTypeArrayStart"
+	case TokenTypeArrayEnd:
+		return "TokenTypeArrayEnd"
+	case TokenTypeComma:
+		return "TokenTypeComma"
+	case TokenTypeSubstitute:
+		return "TokenTypeSubstitute"
+	case TokenTypeInclude:
+		return "TokenTypeInclude"
+	}
+	return "<<unknown token type>>"
+}

@@ -97,6 +97,7 @@ func (p *Parser) parseKeyContent(value *HoconValue, currentPath string) {
 		switch t.tokenType {
 		case TokenTypeDot:
 			p.parseObject(value, false, currentPath)
+			return
 		case TokenTypeAssign:
 			{
 				if !value.IsObject() {
