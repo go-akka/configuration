@@ -26,8 +26,9 @@ var (
 )
 
 type Token struct {
-	tokenType TokenType
-	value     string
+	tokenType  TokenType
+	value      string
+	isOptional bool
 }
 
 func NewToken(v interface{}) *Token {
@@ -50,8 +51,8 @@ func (p *Token) Key(key string) *Token {
 	return &Token{tokenType: TokenTypeKey, value: key}
 }
 
-func (p *Token) Substitution(path string) *Token {
-	return &Token{tokenType: TokenTypeSubstitute, value: path}
+func (p *Token) Substitution(path string, isOptional bool) *Token {
+	return &Token{tokenType: TokenTypeSubstitute, value: path, isOptional: isOptional}
 }
 
 func (p *Token) LiteralValue(value string) *Token {

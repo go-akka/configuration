@@ -456,8 +456,10 @@ func (p *HoconTokenizer) IsInclude() bool {
 func (p *HoconTokenizer) pullSubstitution() *Token {
 	buf := bytes.NewBuffer(nil)
 	p.Take(2)
+	isOptional := false
 	if p.Peek() == '?' {
 		p.TakeOne()
+		isOptional = true
 	}
 
 	for !p.EOF() && p.isUnquotedText() {
@@ -466,7 +468,7 @@ func (p *HoconTokenizer) pullSubstitution() *Token {
 		}
 	}
 	p.TakeOne()
-	return DefaultToken.Substitution(buf.String())
+	return DefaultToken.Substitution(buf.String(), isOptional)
 }
 
 func (p *HoconTokenizer) IsSpaceOrTab() bool {

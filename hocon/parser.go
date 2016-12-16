@@ -35,11 +35,14 @@ func (p *Parser) parseText(text string, callback IncludeCallback) *HoconRoot {
 		if res == nil {
 			envVal, exist := os.LookupEnv(sub.Path)
 			if !exist {
-				panic("Unresolved substitution:" + sub.Path)
+				if !sub.IsOptional {
+					panic("Unresolved substitution:" + sub.Path)
+				}
+			} else {
+				hv := NewHoconValue()
+				hv.AppendValue(NewHoconLiteral(envVal))
+				sub.ResolvedValue = hv
 			}
-			hv := NewHoconValue()
-			hv.AppendValue(NewHoconLiteral(envVal))
-			sub.ResolvedValue = hv
 		} else {
 			sub.ResolvedValue = res
 		}
@@ -131,7 +134,7 @@ func (p *Parser) ParseValue(owner *HoconValue, isEqualPlus bool, currentPath str
 		t := p.reader.PullValue()
 
 		if isEqualPlus {
-			sub := p.ParseSubstitution(currentPath)
+			sub := p.ParseSubstitution(currentPath, false)
 			p.substitutions = append(p.substitutions, sub)
 			owner.AppendValue(sub)
 		}
@@ -150,7 +153,7 @@ func (p *Parser) ParseValue(owner *HoconValue, isEqualPlus bool, currentPath str
 			arr := p.ParseArray(currentPath)
 			owner.AppendValue(&arr)
 		case TokenTypeSubstitute:
-			sub := p.ParseSubstitution(t.value)
+			sub := p.ParseSubstitution(t.value, t.isOptional)
 			p.substitutions = append(p.substitutions, sub)
 			owner.AppendValue(sub)
 		}
@@ -171,8 +174,8 @@ func (p *Parser) ParseTrailingWhitespace(owner *HoconValue) {
 	}
 }
 
-func (p *Parser) ParseSubstitution(value string) *HoconSubstitution {
-	return NewHoconSubstitution(value)
+func (p *Parser) ParseSubstitution(value string, isOptional bool) *HoconSubstitution {
+	return NewHoconSubstitution(value, isOptional)
 }
 
 func (p *Parser) ParseArray(currentPath string) HoconArray {
