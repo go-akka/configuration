@@ -80,6 +80,11 @@ config.array: [one two three]
 config.bar: bar
 config.foo: foo.bar
 config.number: 1
-config.object.a: a
+config.object.a: newA
 config.object.c.d: a
+config.object.c.f: valueF
+self-ref: [1 2]
+byte-size: 10485760
+home: /Users/zeal
+default: default-value
 ```
