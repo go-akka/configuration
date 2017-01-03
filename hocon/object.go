@@ -29,6 +29,10 @@ func (p *HoconObject) GetArray() []*HoconValue {
 	panic("This element is an object and not an array.")
 }
 
+func (p *HoconObject) GetKeys() []string {
+	return p.keys
+}
+
 func (p *HoconObject) GetKey(key string) *HoconValue {
 	value, _ := p.items[key]
 	return value
