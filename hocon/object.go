@@ -33,6 +33,29 @@ func (p *HoconObject) GetKeys() []string {
 	return p.keys
 }
 
+func (p *HoconObject) Unwrapped() map[string]interface{} {
+	if len(p.items) == 0 {
+		return nil
+	}
+
+	dics := map[string]interface{}{}
+
+	for k, v := range p.items {
+		obj := v.GetObject()
+		if obj != nil {
+			dics[k] = obj.Unwrapped()
+		} else {
+			dics[k] = v
+		}
+	}
+
+	return dics
+}
+
+func (p *HoconObject) Items() map[string]*HoconValue {
+	return p.items
+}
+
 func (p *HoconObject) GetKey(key string) *HoconValue {
 	value, _ := p.items[key]
 	return value
