@@ -44,14 +44,19 @@ func (p *Config) Root() *hocon.HoconValue {
 	return p.root
 }
 
-func (p *Config) Copy() *Config {
+func (p *Config) Copy(fallback ...*Config) *Config {
 
-	var fallback *Config
+	var fb *Config
+
 	if p.fallback != nil {
-		fallback = p.fallback.Copy()
+		fb = p.fallback.Copy()
+	} else {
+		if len(fallback) > 0 {
+			fb = fallback[0]
+		}
 	}
 	return &Config{
-		fallback:      fallback,
+		fallback:      fb,
 		root:          p.root,
 		substitutions: p.substitutions,
 	}
@@ -256,13 +261,20 @@ func (p *Config) WithFallback(fallback *Config) *Config {
 		panic("Config can not have itself as fallback")
 	}
 
-	clone := p.Copy()
-	current := clone
-	for current.fallback != nil {
-		current = current.fallback
+	if fallback == nil {
+		return p
 	}
-	current.fallback = fallback
-	return clone
+
+	mergedRoot := p.root.GetObject().MergeImmutable(fallback.root.GetObject())
+	newRoot := hocon.NewHoconValue()
+
+	newRoot.AppendValue(mergedRoot)
+
+	mergedConfig := p.Copy(fallback)
+
+	mergedConfig.root = newRoot
+
+	return mergedConfig
 }
 
 func (p *Config) HasPath(path string) bool {

@@ -95,11 +95,11 @@ func (p *HoconObject) ToString(indent int) string {
 }
 
 func (p *HoconObject) Merge(other *HoconObject) {
-	thisItems := p.items
+	thisValues := p.items
 	otherItems := other.items
 
 	for otherkey, otherValue := range otherItems {
-		if thisValue, exist := thisItems[otherkey]; exist {
+		if thisValue, exist := thisValues[otherkey]; exist {
 			if thisValue.IsObject() && otherValue.IsObject() {
 				thisValue.GetObject().Merge(otherValue.GetObject())
 			}
@@ -108,6 +108,32 @@ func (p *HoconObject) Merge(other *HoconObject) {
 			p.keys = append(p.keys, otherkey)
 		}
 	}
+}
+
+func (p *HoconObject) MergeImmutable(other *HoconObject) *HoconObject {
+	thisValues := map[string]*HoconValue{}
+	var thisKeys []string
+
+	otherItems := other.items
+
+	for otherkey, otherValue := range otherItems {
+		if thisValue, exist := thisValues[otherkey]; exist {
+
+			if thisValue.IsObject() && otherValue.IsObject() {
+
+				mergedObject := thisValue.GetObject().MergeImmutable(otherValue.GetObject())
+				mergedValue := NewHoconValue()
+
+				mergedValue.AppendValue(mergedObject)
+				thisValues[otherkey] = mergedValue
+			}
+		} else {
+			thisValues[otherkey] = &HoconValue{values: otherValue.values}
+			thisKeys = append(thisKeys, otherkey)
+		}
+	}
+
+	return &HoconObject{items: thisValues, keys: thisKeys}
 }
 
 func (p *HoconObject) quoteIfNeeded(text string) string {
