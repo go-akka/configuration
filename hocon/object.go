@@ -40,7 +40,9 @@ func (p *HoconObject) Unwrapped() map[string]interface{} {
 
 	dics := map[string]interface{}{}
 
-	for k, v := range p.items {
+	for _, k := range p.keys {
+		v := p.items[k]
+
 		obj := v.GetObject()
 		if obj != nil {
 			dics[k] = obj.Unwrapped()
@@ -98,7 +100,11 @@ func (p *HoconObject) Merge(other *HoconObject) {
 	thisValues := p.items
 	otherItems := other.items
 
-	for otherkey, otherValue := range otherItems {
+	otherKeys := other.keys
+
+	for _, otherkey := range otherKeys {
+		otherValue := otherItems[otherkey]
+
 		if thisValue, exist := thisValues[otherkey]; exist {
 			if thisValue.IsObject() && otherValue.IsObject() {
 				thisValue.GetObject().Merge(otherValue.GetObject())
@@ -112,11 +118,15 @@ func (p *HoconObject) Merge(other *HoconObject) {
 
 func (p *HoconObject) MergeImmutable(other *HoconObject) *HoconObject {
 	thisValues := map[string]*HoconValue{}
+	otherKeys := other.keys
+
 	var thisKeys []string
 
 	otherItems := other.items
 
-	for otherkey, otherValue := range otherItems {
+	for _, otherkey := range otherKeys {
+		otherValue := otherItems[otherkey]
+
 		if thisValue, exist := thisValues[otherkey]; exist {
 
 			if thisValue.IsObject() && otherValue.IsObject() {
