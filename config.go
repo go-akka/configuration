@@ -37,7 +37,7 @@ func NewConfigFromConfig(source, fallback *Config) *Config {
 }
 
 func (p *Config) IsEmpty() bool {
-	return p.root == nil || p.root.IsEmpty()
+	return p == nil || p.root == nil || p.root.IsEmpty()
 }
 
 func (p *Config) Root() *hocon.HoconValue {
@@ -63,6 +63,10 @@ func (p *Config) Copy(fallback ...*Config) *Config {
 }
 
 func (p *Config) GetNode(path string) *hocon.HoconValue {
+	if p == nil {
+		return nil
+	}
+
 	elements := splitDottedPathHonouringQuotes(path)
 	currentNode := p.root
 
@@ -84,7 +88,7 @@ func (p *Config) GetNode(path string) *hocon.HoconValue {
 
 func (p *Config) GetBoolean(path string, defaultVal ...bool) bool {
 	obj := p.GetNode(path)
-	if obj := p.GetNode(path); obj == nil {
+	if obj == nil {
 		if len(defaultVal) > 0 {
 			return defaultVal[0]
 		}
@@ -103,7 +107,7 @@ func (p *Config) GetByteSize(path string) *big.Int {
 
 func (p *Config) GetInt32(path string, defaultVal ...int32) int32 {
 	obj := p.GetNode(path)
-	if obj := p.GetNode(path); obj == nil {
+	if obj == nil {
 		if len(defaultVal) > 0 {
 			return defaultVal[0]
 		}
@@ -114,7 +118,7 @@ func (p *Config) GetInt32(path string, defaultVal ...int32) int32 {
 
 func (p *Config) GetInt64(path string, defaultVal ...int64) int64 {
 	obj := p.GetNode(path)
-	if obj := p.GetNode(path); obj == nil {
+	if obj == nil {
 		if len(defaultVal) > 0 {
 			return defaultVal[0]
 		}
@@ -125,7 +129,7 @@ func (p *Config) GetInt64(path string, defaultVal ...int64) int64 {
 
 func (p *Config) GetString(path string, defaultVal ...string) string {
 	obj := p.GetNode(path)
-	if obj := p.GetNode(path); obj == nil {
+	if obj == nil {
 		if len(defaultVal) > 0 {
 			return defaultVal[0]
 		}
@@ -136,7 +140,7 @@ func (p *Config) GetString(path string, defaultVal ...string) string {
 
 func (p *Config) GetFloat32(path string, defaultVal ...float32) float32 {
 	obj := p.GetNode(path)
-	if obj := p.GetNode(path); obj == nil {
+	if obj == nil {
 		if len(defaultVal) > 0 {
 			return defaultVal[0]
 		}
@@ -146,7 +150,7 @@ func (p *Config) GetFloat32(path string, defaultVal ...float32) float32 {
 
 func (p *Config) GetFloat64(path string, defaultVal ...float64) float64 {
 	obj := p.GetNode(path)
-	if obj := p.GetNode(path); obj == nil {
+	if obj == nil {
 		if len(defaultVal) > 0 {
 			return defaultVal[0]
 		}
@@ -157,7 +161,7 @@ func (p *Config) GetFloat64(path string, defaultVal ...float64) float64 {
 
 func (p *Config) GetTimeDuration(path string, defaultVal ...time.Duration) time.Duration {
 	obj := p.GetNode(path)
-	if obj := p.GetNode(path); obj == nil {
+	if obj == nil {
 		if len(defaultVal) > 0 {
 			return defaultVal[0]
 		}
@@ -168,7 +172,7 @@ func (p *Config) GetTimeDuration(path string, defaultVal ...time.Duration) time.
 
 func (p *Config) GetTimeDurationInfiniteNotAllowed(path string, defaultVal ...time.Duration) time.Duration {
 	obj := p.GetNode(path)
-	if obj := p.GetNode(path); obj == nil {
+	if obj == nil {
 		if len(defaultVal) > 0 {
 			return defaultVal[0]
 		}
@@ -179,7 +183,7 @@ func (p *Config) GetTimeDurationInfiniteNotAllowed(path string, defaultVal ...ti
 
 func (p *Config) GetBooleanList(path string) []bool {
 	obj := p.GetNode(path)
-	if obj := p.GetNode(path); obj == nil {
+	if obj == nil {
 		return nil
 	}
 	return obj.GetBooleanList()
@@ -187,7 +191,7 @@ func (p *Config) GetBooleanList(path string) []bool {
 
 func (p *Config) GetFloat32List(path string) []float32 {
 	obj := p.GetNode(path)
-	if obj := p.GetNode(path); obj == nil {
+	if obj == nil {
 		return nil
 	}
 	return obj.GetFloat32List()
@@ -195,7 +199,7 @@ func (p *Config) GetFloat32List(path string) []float32 {
 
 func (p *Config) GetFloat64List(path string) []float64 {
 	obj := p.GetNode(path)
-	if obj := p.GetNode(path); obj == nil {
+	if obj == nil {
 		return nil
 	}
 	return obj.GetFloat64List()
@@ -203,7 +207,7 @@ func (p *Config) GetFloat64List(path string) []float64 {
 
 func (p *Config) GetInt32List(path string) []int32 {
 	obj := p.GetNode(path)
-	if obj := p.GetNode(path); obj == nil {
+	if obj == nil {
 		return nil
 	}
 	return obj.GetInt32List()
@@ -211,7 +215,7 @@ func (p *Config) GetInt32List(path string) []int32 {
 
 func (p *Config) GetInt64List(path string) []int64 {
 	obj := p.GetNode(path)
-	if obj := p.GetNode(path); obj == nil {
+	if obj == nil {
 		return nil
 	}
 	return obj.GetInt64List()
@@ -219,7 +223,7 @@ func (p *Config) GetInt64List(path string) []int64 {
 
 func (p *Config) GetByteList(path string) []byte {
 	obj := p.GetNode(path)
-	if obj := p.GetNode(path); obj == nil {
+	if obj == nil {
 		return nil
 	}
 	return obj.GetByteList()
@@ -227,13 +231,17 @@ func (p *Config) GetByteList(path string) []byte {
 
 func (p *Config) GetStringList(path string) []string {
 	obj := p.GetNode(path)
-	if obj := p.GetNode(path); obj == nil {
+	if obj == nil {
 		return nil
 	}
 	return obj.GetStringList()
 }
 
 func (p *Config) GetConfig(path string) *Config {
+	if p == nil {
+		return nil
+	}
+
 	value := p.GetNode(path)
 	if p.fallback != nil {
 		f := p.fallback.GetConfig(path)
