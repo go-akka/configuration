@@ -8,10 +8,11 @@ type HoconSubstitution struct {
 	Path          string
 	ResolvedValue *HoconValue
 	IsOptional    bool
+	OrignialPath  string
 }
 
 func NewHoconSubstitution(path string, isOptional bool) *HoconSubstitution {
-	return &HoconSubstitution{Path: path, IsOptional: isOptional}
+	return &HoconSubstitution{Path: path, OrignialPath: path, IsOptional: isOptional}
 }
 
 func (p *HoconSubstitution) IsString() bool {

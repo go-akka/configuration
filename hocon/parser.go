@@ -33,7 +33,7 @@ func (p *Parser) parseText(text string, callback IncludeCallback) *HoconRoot {
 	for _, sub := range p.substitutions {
 		res := getNode(cRoot, sub.Path)
 		if res == nil {
-			envVal, exist := os.LookupEnv(sub.Path)
+			envVal, exist := os.LookupEnv(sub.OrignialPath)
 			if !exist {
 				if !sub.IsOptional {
 					panic("Unresolved substitution:" + sub.Path)
