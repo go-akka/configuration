@@ -289,6 +289,24 @@ func (p *Config) HasPath(path string) bool {
 	return p.GetNode(path) != nil
 }
 
+func (p *Config) IsObject(path string) bool {
+	node := p.GetNode(path)
+	if node == nil {
+		return false
+	}
+
+	return node.IsObject()
+}
+
+func (p *Config) IsArray(path string) bool {
+	node := p.GetNode(path)
+	if node == nil {
+		return false
+	}
+
+	return node.IsArray()
+}
+
 func (p *Config) AddConfig(textConfig string, fallbackConfig *Config) *Config {
 	root := hocon.Parse(textConfig, nil)
 	config := NewConfigFromRoot(root)
