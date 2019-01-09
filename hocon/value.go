@@ -70,8 +70,8 @@ func (p *HoconValue) AtKey(key string) *HoconRoot {
 }
 
 func (p *HoconValue) IsString() bool {
-
 	strCount := 0
+
 	for _, v := range p.values {
 		v = p.topValueOfSub(v)
 		if v.IsString() {
@@ -94,6 +94,9 @@ func (p *HoconValue) topValueOfSub(v interface{}) HoconElement {
 	if sub, ok := v.(*HoconSubstitution); ok {
 		if sub.ResolvedValue != nil && sub.ResolvedValue.oldValue != nil {
 			return sub.ResolvedValue.oldValue
+		}
+		if sub.ResolvedValue == nil && p.oldValue != nil {
+			return p.oldValue
 		}
 	}
 
