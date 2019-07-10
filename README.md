@@ -1,6 +1,6 @@
 HOCON (Human-Optimized Config Object Notation)
 =====
-
+[![GoDoc](https://godoc.org/github.com/go-akka/configuration?status.svg)](https://godoc.org/github.com/go-akka/configuration)
 [HOCON Docs](https://github.com/typesafehub/config/blob/master/HOCON.md).
 
 > Currently, some features are not implemented, the API might be a little changed in the future.
