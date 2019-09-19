@@ -149,7 +149,7 @@ func (p *HoconValue) GetByteSize() *big.Int {
 		case "YB", "yottabyte", "yottabytes":
 			return (&big.Int{}).Mul(bigInt, _YByte)
 		case "K", "k", "Ki", "KiB", "kibibyte", "kibibytes":
-			return (&big.Int{}).Mul(bigInt, _Byte)
+			return (&big.Int{}).Mul(bigInt, _KiByte)
 		case "M", "m", "Mi", "MiB", "mebibyte", "mebibytes":
 			return (&big.Int{}).Mul(bigInt, _MiByte)
 		case "G", "g", "Gi", "GiB", "gibibyte", "gibibytes":
