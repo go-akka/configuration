@@ -242,106 +242,122 @@ func (p *HoconValue) NewValue(value HoconElement) {
 	p.values = append(p.values, value)
 }
 
-func (p *HoconValue) GetBoolean() bool {
+func (p *HoconValue) GetBoolean() (bool, err) {
 	v := p.GetString()
 	switch v {
 	case "on":
-		return true
+		return true, nil
 	case "off":
-		return false
+		return false, nil
 	case "true":
-		return true
+		return true, nil
 	case "false":
-		return false
+		return false, nil
 	default:
-		panic("Unknown boolean format: " + v)
+		return false, fmt.Errorf("Unknown boolean format: " + v)
 	}
 }
 
-func (p *HoconValue) GetString() string {
+func (p *HoconValue) GetString() (string, error)
 	if p.IsString() {
 		return p.concatString()
 	}
 	return ""
 }
 
-func (p *HoconValue) GetFloat64() float64 {
+func (p *HoconValue) GetFloat64() (float64, error)
 	val, err := strconv.ParseFloat(p.GetString(), 64)
 	if err != nil {
-		panic(err)
+		return nil, err
 	}
 	return val
 }
 
-func (p *HoconValue) GetFloat32() float32 {
+func (p *HoconValue) GetFloat32() (float32, error)
 	val, err := strconv.ParseFloat(p.GetString(), 32)
 	if err != nil {
-		panic(err)
+		return nil, err
 	}
 	return float32(val)
 }
 
-func (p *HoconValue) GetInt64() int64 {
+func (p *HoconValue) GetInt64() (int64, error)
 	val, err := strconv.ParseInt(p.GetString(), 10, 64)
 	if err != nil {
-		panic(err)
+		return nil, err
 	}
 	return val
 }
 
-func (p *HoconValue) GetInt32() int32 {
+func (p *HoconValue) GetInt32() (int32, error)
 	val, err := strconv.ParseInt(p.GetString(), 10, 32)
 	if err != nil {
-		panic(err)
+		return nil, err
 	}
 	return int32(val)
 }
 
-func (p *HoconValue) GetByte() byte {
+func (p *HoconValue) GetByte() (byte, error)
 	val, err := strconv.ParseUint(p.GetString(), 10, 8)
 	if err != nil {
-		panic(err)
+		return nil, err
 	}
 	return byte(val)
 }
 
-func (p *HoconValue) GetByteList() []byte {
+func (p *HoconValue) GetByteList() ([]byte, error) {
 	arrs := p.GetArray()
 	var items []byte
 	for _, v := range arrs {
-		items = append(items, v.GetByte())
+		b, err !=  v.GetByte()
+		if err != nil {
+			return nil, err
+		}
+		items = append(items,b)
 	}
 	return items
 }
 
-func (p *HoconValue) GetInt32List() []int32 {
+func (p *HoconValue) GetInt32List() ([]int32, error) {
 	arrs := p.GetArray()
 	var items []int32
 	for _, v := range arrs {
-		items = append(items, v.GetInt32())
+		i, err !=  v.GetInt32()
+		if err != nil {
+			return nil, err
+		}
+		items = append(items, i)
 	}
 	return items
 }
 
-func (p *HoconValue) GetInt64List() []int64 {
+func (p *HoconValue) GetInt64List() ([]int64, error) {
 	arrs := p.GetArray()
 	var items []int64
 	for _, v := range arrs {
-		items = append(items, v.GetInt64())
+		i, err !=  v.GetInt64()
+		if err != nil {
+			return nil, err
+		}
+		items = append(items, i)
 	}
 	return items
 }
 
-func (p *HoconValue) GetBooleanList() []bool {
+func (p *HoconValue) GetBooleanList() ([]bool, error) {
 	arrs := p.GetArray()
 	var items []bool
 	for _, v := range arrs {
-		items = append(items, v.GetBoolean())
+		b, err !=  v.GetBoolean()
+		if err != nil {
+			return nil, err
+		}
+		items = append(items, b)
 	}
 	return items
 }
 
-func (p *HoconValue) GetFloat32List() []float32 {
+func (p *HoconValue) GetFloat32List() ([]float32, error) {
 	arrs := p.GetArray()
 	var items []float32
 	for _, v := range arrs {
@@ -350,20 +366,28 @@ func (p *HoconValue) GetFloat32List() []float32 {
 	return items
 }
 
-func (p *HoconValue) GetFloat64List() []float64 {
+func (p *HoconValue) GetFloat64List() ([]float64, error) {
 	arrs := p.GetArray()
 	var items []float64
 	for _, v := range arrs {
-		items = append(items, v.GetFloat64())
+		f, err !=  v.GetFloat64()
+		if err != nil {
+			return nil, err
+		}
+		items = append(items, f)
 	}
 	return items
 }
 
-func (p *HoconValue) GetStringList() []string {
+func (p *HoconValue) GetStringList() ([]string, error) {
 	arrs := p.GetArray()
 	var items []string
 	for _, v := range arrs {
-		items = append(items, v.GetString())
+		str, err := v.GetString()
+		if err != nil {
+			return nil, err
+		}
+		items = append(items, str)
 	}
 	return items
 }
@@ -397,8 +421,11 @@ func (p *HoconValue) IsArray() bool {
 	return p.GetArray() != nil
 }
 
-func (p *HoconValue) GetTimeDuration(allowInfinite bool) time.Duration {
-	res := p.GetString()
+func (p *HoconValue) GetTimeDuration(allowInfinite bool) (time.Duration, error) {
+	res, err := p.GetString()
+	if err != nil {
+		return nil, err
+	}
 	groups, matched := findStringSubmatchMap(res, `^(?P<value>([0-9]+(\.[0-9]+)?))\s*(?P<unit>(nanoseconds|nanosecond|nanos|nano|ns|microseconds|microsecond|micros|micro|us|milliseconds|millisecond|millis|milli|ms|seconds|second|s|minutes|minute|m|hours|hour|h|days|day|d))$`)
 
 	if matched {
@@ -428,7 +455,7 @@ func (p *HoconValue) GetTimeDuration(allowInfinite bool) time.Duration {
 		if allowInfinite {
 			return time.Duration(-1)
 		}
-		panic("infinite time duration not allowed")
+		return nil, errors.New("infinite time duration not allowed")
 	}
 
 	return time.Duration(float64(time.Millisecond) * parsePositiveValue(res))
@@ -465,13 +492,13 @@ func findStringSubmatchMap(s, exp string) (map[string]string, bool) {
 	return captures, true
 }
 
-func parsePositiveValue(v string) float64 {
+func parsePositiveValue(v string) (float64, error) {
 	value, err := strconv.ParseFloat(v, 64)
 	if err != nil {
-		panic(err)
+		return nil, err
 	}
 	if value < 0 {
-		panic("Expected a positive value instead of " + v)
+		return nil, fmt.Errorf("Expected a positive value instead of " + v)
 	}
 	return value
 }
