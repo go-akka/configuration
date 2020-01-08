@@ -86,15 +86,23 @@ func (p *Config) GetNode(path string) *hocon.HoconValue {
 	return currentNode
 }
 
-func (p *Config) GetBoolean(path string, defaultVal ...bool) bool {
+func (p *Config) GetBooleanSafely(path string, defaultVal ...bool) (bool, error) {
 	obj := p.GetNode(path)
 	if obj == nil {
 		if len(defaultVal) > 0 {
-			return defaultVal[0]
+			return defaultVal[0], nil
 		}
-		return false
+		return false, nil
 	}
-	return obj.GetBoolean()
+	return obj.GetBooleanSafely()
+}
+
+func (p *Config) GetBoolean(path string, defaultVal ...bool) bool {
+	val, err := p.GetBooleanSafely(path, defaultVal...)
+	if err != nil {
+		panic(err)
+	}
+	return val
 }
 
 func (p *Config) GetByteSize(path string) *big.Int {
@@ -105,26 +113,42 @@ func (p *Config) GetByteSize(path string) *big.Int {
 	return obj.GetByteSize()
 }
 
-func (p *Config) GetInt32(path string, defaultVal ...int32) int32 {
+func (p *Config) GetInt32Safely(path string, defaultVal ...int32) (int32, error) {
 	obj := p.GetNode(path)
 	if obj == nil {
 		if len(defaultVal) > 0 {
-			return defaultVal[0]
+			return defaultVal[0], nil
 		}
-		return 0
+		return 0, nil
 	}
-	return obj.GetInt32()
+	return obj.GetInt32Safely()
+}
+
+func (p *Config) GetInt32(path string, defaultVal ...int32) int32 {
+	val, err := p.GetInt32Safely(path, defaultVal...)
+	if err != nil {
+		panic(err)
+	}
+	return val
+}
+
+func (p *Config) GetInt64Safely(path string, defaultVal ...int64) (int64, error) {
+	obj := p.GetNode(path)
+	if obj == nil {
+		if len(defaultVal) > 0 {
+			return defaultVal[0], nil
+		}
+		return 0, nil
+	}
+	return obj.GetInt64Safely()
 }
 
 func (p *Config) GetInt64(path string, defaultVal ...int64) int64 {
-	obj := p.GetNode(path)
-	if obj == nil {
-		if len(defaultVal) > 0 {
-			return defaultVal[0]
-		}
-		return 0
+	val, err := p.GetInt64Safely(path, defaultVal...)
+	if err != nil {
+		panic(err)
 	}
-	return obj.GetInt64()
+	return val
 }
 
 func (p *Config) GetString(path string, defaultVal ...string) string {
@@ -138,25 +162,42 @@ func (p *Config) GetString(path string, defaultVal ...string) string {
 	return obj.GetString()
 }
 
-func (p *Config) GetFloat32(path string, defaultVal ...float32) float32 {
+func (p *Config) GetFloat32Safely(path string, defaultVal ...float32) (float32, error) {
 	obj := p.GetNode(path)
 	if obj == nil {
 		if len(defaultVal) > 0 {
-			return defaultVal[0]
+			return defaultVal[0], nil
 		}
+		return 0, nil
 	}
-	return obj.GetFloat32()
+	return obj.GetFloat32Safely()
+}
+
+func (p *Config) GetFloat32(path string, defaultVal ...float32) float32 {
+	val, err := p.GetFloat32Safely(path, defaultVal...)
+	if err != nil {
+		panic(err)
+	}
+	return val
+}
+
+func (p *Config) GetFloat64Safely(path string, defaultVal ...float64) (float64, error) {
+	obj := p.GetNode(path)
+	if obj == nil {
+		if len(defaultVal) > 0 {
+			return defaultVal[0], nil
+		}
+		return 0, nil
+	}
+	return obj.GetFloat64Safely()
 }
 
 func (p *Config) GetFloat64(path string, defaultVal ...float64) float64 {
-	obj := p.GetNode(path)
-	if obj == nil {
-		if len(defaultVal) > 0 {
-			return defaultVal[0]
-		}
-		return 0
+	val, err := p.GetFloat64Safely(path, defaultVal...)
+	if err != nil {
+		panic(err)
 	}
-	return obj.GetFloat64()
+	return val
 }
 
 func (p *Config) GetTimeDuration(path string, defaultVal ...time.Duration) time.Duration {
@@ -181,52 +222,100 @@ func (p *Config) GetTimeDurationInfiniteNotAllowed(path string, defaultVal ...ti
 	return obj.GetTimeDuration(false)
 }
 
-func (p *Config) GetBooleanList(path string) []bool {
+func (p *Config) GetBooleanListSafely(path string) ([]bool, error) {
 	obj := p.GetNode(path)
 	if obj == nil {
-		return nil
+		return nil, nil
 	}
-	return obj.GetBooleanList()
+	return obj.GetBooleanListSafely()
+}
+
+func (p *Config) GetBooleanList(path string) []bool {
+	val, err := p.GetBooleanListSafely(path)
+	if err != nil {
+		panic(err)
+	}
+	return val
+}
+
+func (p *Config) GetFloat32ListSafely(path string) ([]float32, error) {
+	obj := p.GetNode(path)
+	if obj == nil {
+		return nil, nil
+	}
+	return obj.GetFloat32ListSafely()
 }
 
 func (p *Config) GetFloat32List(path string) []float32 {
+	val, err := p.GetFloat32ListSafely(path)
+	if err != nil {
+		panic(err)
+	}
+	return val
+}
+
+func (p *Config) GetFloat64ListSafely(path string) ([]float64, error) {
 	obj := p.GetNode(path)
 	if obj == nil {
-		return nil
+		return nil, nil
 	}
-	return obj.GetFloat32List()
+	return obj.GetFloat64ListSafely()
 }
 
 func (p *Config) GetFloat64List(path string) []float64 {
+	val, err := p.GetFloat64ListSafely(path)
+	if err != nil {
+		panic(err)
+	}
+	return val
+}
+
+func (p *Config) GetInt32ListSafely(path string) ([]int32, error) {
 	obj := p.GetNode(path)
 	if obj == nil {
-		return nil
+		return nil, nil
 	}
-	return obj.GetFloat64List()
+	return obj.GetInt32ListSafely()
 }
 
 func (p *Config) GetInt32List(path string) []int32 {
+	val, err := p.GetInt32ListSafely(path)
+	if err != nil {
+		panic(err)
+	}
+	return val
+}
+
+func (p *Config) GetInt64ListSafely(path string) ([]int64, error) {
 	obj := p.GetNode(path)
 	if obj == nil {
-		return nil
+		return nil, nil
 	}
-	return obj.GetInt32List()
+	return obj.GetInt64ListSafely()
 }
 
 func (p *Config) GetInt64List(path string) []int64 {
+	val, err := p.GetInt64ListSafely(path)
+	if err != nil {
+		panic(err)
+	}
+	return val
+}
+
+func (p *Config) GetByteListSafely(path string) ([]byte, error) {
 	obj := p.GetNode(path)
 	if obj == nil {
-		return nil
+		return nil, nil
 	}
-	return obj.GetInt64List()
+	return obj.GetByteListSafely()
 }
 
 func (p *Config) GetByteList(path string) []byte {
-	obj := p.GetNode(path)
-	if obj == nil {
-		return nil
+	val, err := p.GetByteListSafely(path)
+	if err != nil {
+		panic(err)
 	}
-	return obj.GetByteList()
+	return val
 }
 
 func (p *Config) GetStringList(path string) []string {
