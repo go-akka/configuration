@@ -243,15 +243,11 @@ func (p *HoconValue) NewValue(value HoconElement) {
 }
 
 func (p *HoconValue) GetBoolean() bool {
-	v := p.GetString()
+	v := strings.ToLower(p.GetString())
 	switch v {
-	case "on":
+	case "on", "true", "yes":
 		return true
-	case "off":
-		return false
-	case "true":
-		return true
-	case "false":
+	case "off", "false", "no":
 		return false
 	default:
 		panic("Unknown boolean format: " + v)
