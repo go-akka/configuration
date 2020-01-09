@@ -2,6 +2,7 @@ package configuration
 
 import (
 	"fmt"
+	"github.com/stretchr/testify/assert"
 	"runtime"
 	"sync"
 	"testing"
@@ -42,4 +43,15 @@ func TestParseKeyOrder(t *testing.T) {
 	go fn()
 
 	wg.Wait()
+}
+
+func TestUnexpectedEndOfObject(t *testing.T) {
+	assert.Panics(t, func() {
+		ParseString(`packets: [ { data = 1 } }`)
+	})
+
+	assert.Panics(t, func() {
+		ParseString(`packets: [ { data = 1 } ] }`)
+	})
+
 }
