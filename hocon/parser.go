@@ -170,6 +170,11 @@ func (p *Parser) ParseValue(owner *HoconValue, isEqualPlus bool, currentPath str
 			p.ParseTrailingWhitespace(owner)
 		}
 	}
+
+	if p.reader.IsEndOfObject() {
+		panic("unexpected end of object")
+	}
+
 	p.ignoreComma()
 	p.ignoreNewline()
 }
