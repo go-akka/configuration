@@ -370,7 +370,7 @@ func (p *HoconValue) GetArray() []*HoconValue {
 	if len(p.values) == 0 {
 		return arrs
 	}
-	arrs = []*HoconValue{}
+
 	for _, v := range p.values {
 		v = p.topValueOfSub(v)
 		if v.IsArray() {
