@@ -2,9 +2,8 @@ package configuration
 
 import (
 	"encoding/json"
+	"github.com/go-akka/configuration/hocon/hocon"
 	"io/ioutil"
-
-	"github.com/go-akka/configuration/hocon"
 )
 
 func ParseString(text string, includeCallback ...hocon.IncludeCallback) *Config {
